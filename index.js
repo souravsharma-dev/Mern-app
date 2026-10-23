@@ -21,7 +21,7 @@ mongoose.connect(
   console.error('MongoDB Connection Error:', err);
 });
 
-//define a schema for the data sofe os
+//define a schema for the data sofe osdads
 const itemSchema = new mongoose.Schema({
     name: String,
     description: String,
