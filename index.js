@@ -8,9 +8,7 @@ const PORT = 3000;
 // Middleware
 app.use(bodyParser.json());
 
-// Connect to MongoDB
-mongoose.connect('mongodb+srv://souravdummy:L7Dijh62E%40YL2rc@cluster0.cs8z1es.mongodb.net/expresscrud')
-
+// MongoDB Connection
 mongoose.connect(
   'mongodb+srv://souravdummy:L7Dijh62E%40YL2rc@cluster0.cs8z1es.mongodb.net/expresscrud'
 )
@@ -21,17 +19,22 @@ mongoose.connect(
   console.error('MongoDB Connection Error:', err);
 });
 
-//define a schema for the data sofe osdads
+// Root Route
+app.get('/', (req, res) => {
+  res.send('Server is running successfully');
+});
+
+// Schema
 const itemSchema = new mongoose.Schema({
-    name: String,
-    description: String,
+  name: String,
+  description: String,
 });
 
 const Item = mongoose.model('Item', itemSchema);
 
-//create a new item 
+// Create Item
 app.post('/items', async (req, res) => {
-  try{
+  try {
     const newItem = new Item(req.body);
     const savedItem = await newItem.save();
     res.status(201).json(savedItem);
@@ -40,7 +43,7 @@ app.post('/items', async (req, res) => {
   }
 });
 
-//read all items
+// Read All Items
 app.get('/items', async (req, res) => {
   try {
     const items = await Item.find();
@@ -50,8 +53,46 @@ app.get('/items', async (req, res) => {
   }
 });
 
+// Delete Item
+app.delete('/items/:id', async (req, res) => {
+  try {
+    const deletedItem = await Item.findByIdAndDelete(req.params.id);
 
+    if (!deletedItem) {
+      return res.status(404).json({
+        error: 'Item not found'
+      });
+    }
+
+    res.json({
+      message: 'Item deleted successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
+
+//Update Item
+app.put('/items/:id', async (req, res) => {
+  try {
+    const updatedItem = await Item.findByIdAndUpdate( req.params.id, req.body, { new: true });
+
+    if (!updatedItem) {
+
+      return res.status(404).json({
+        error: 'Item not found'
+      });
+    }                                                                                 
+    res.json(updatedItem);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message
+    });
+  }
+});
 
 app.listen(PORT, () => {
-    console.log(`server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });
